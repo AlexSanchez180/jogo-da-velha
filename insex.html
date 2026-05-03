@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Splash Screen - Jogo da Velha (Estilo Vintage)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Courier New', 'Franklin Gothic Heavy', 'Impact', monospace;
+            background: #000000;
+        }
+
+        /* Container principal */
+        .splash-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Textura de filme antigo com grão */
+        .splash-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" opacity="0.15"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
+            background-repeat: repeat;
+            background-size: 180px;
+            pointer-events: none;
+            z-index: 2;
+            mix-blend-mode: overlay;
+        }
+
+        /* Vinheta - cantos escuros */
+        .splash-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 120%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Conteúdo central */
+        .splash-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Estúdio IVO & ARTHUR */
+        .studio-brand {
+            opacity: 0;
+            transform: scale(0.85);
+            margin-bottom: 35px;
+        }
+
+        .studio-brand h2 {
+            font-size: clamp(1.5rem, 7vw, 3.5rem);
+            letter-spacing: clamp(6px, 2vw, 15px);
+            font-family: 'Courier New', 'Franklin Gothic Heavy', monospace;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f5e2b0, #d4a055, #b87a2e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px #ffcc66, 0 2px 5px #7a3a10;
+            white-space: nowrap;
+        }
+
+        .studio-brand p {
+            font-size: clamp(0.7rem, 3vw, 1rem);
+            letter-spacing: 5px;
+            color: #c9974c;
+            margin-top: 12px;
+            font-family: monospace;
+            text-transform: uppercase;
+        }
+
+        /* Logo JOGO DA VELHA */
+        .game-logo {
+            opacity: 0;
+            transform: scale(0.7);
+            margin-top: 25px;
+        }
+
+        .game-logo h1 {
+            font-size: clamp(2.5rem, 12vw, 6rem);
+            font-weight: 900;
+            font-family: 'Impact', 'Franklin Gothic Heavy', 'Arial Black', sans-serif;
+            letter-spacing: clamp(4px, 1.2vw, 10px);
+            background: linear-gradient(180deg, #ffecb3, #ffaa44, #dd6611);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 6px 6px 0px #5a2a0e, 3px 3px 0px #ffb347;
+            transform: skew(-2deg);
+            animation: vintagePulse 1.6s ease-in-out infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes vintagePulse {
+            0% { text-shadow: 6px 6px 0px #5a2a0e, 3px 3px 0px #ffb347; filter: brightness(1);}
+            50% { text-shadow: 8px 8px 0px #7a3a18, 5px 5px 0px #ffcc66; filter: brightness(1.1);}
+            100% { text-shadow: 6px 6px 0px #5a2a0e, 3px 3px 0px #ffb347; filter: brightness(1);}
+        }
+
+        /* Linha decorativa vintage */
+        .vintage-divider {
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #f5bc6e, #ff9933, #f5bc6e, transparent);
+            margin: 25px auto;
+            border-radius: 4px;
+            box-shadow: 0 0 6px #ffaa55;
+        }
+
+        /* Subtítulo */
+        .tagline {
+            font-size: clamp(0.7rem, 3.5vw, 1.1rem);
+            color: #e8b86b;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+            opacity: 0;
+            margin-top: 18px;
+            text-transform: uppercase;
+            font-weight: bold;
+            background: rgba(0,0,0,0.4);
+            display: inline-block;
+            padding: 5px 18px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Scanlines */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 2px, transparent 2px, transparent 7px);
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0.6;
+        }
+
+        /* Efeito flicker */
+        @keyframes flickerAnim {
+            0% { opacity: 0.95; }
+            4% { opacity: 0.65; }
+            8% { opacity: 0.98; }
+            12% { opacity: 0.7; }
+            16% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        .flicker {
+            animation: flickerAnim 0.2s 4;
+        }
+
+        /* Barra de progresso vintage */
+        .progress-area {
+            position: absolute;
+            bottom: 40px;
+            left: 10%;
+            width: 80%;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.6s;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 5px;
+            background: rgba(70, 40, 15, 0.7);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 0 4px #d4943a;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, #f5bc6e, #ffaa44 12px, #e0872a 12px, #ffbb55 24px);
+            border-radius: 6px;
+            transition: width 0.07s linear;
+            box-shadow: 0 0 8px #ffbb55;
+        }
+
+        /* Detalhes de filme */
+        .film-dots {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 12;
+            opacity: 0.4;
+        }
+        .film-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #e0a55a;
+            border-radius: 50%;
+            margin: 0 3px;
+            box-shadow: 0 0 2px #ffcc77;
+        }
+
+        /* Botão pular */
+        .skip-btn {
+            position: absolute;
+            bottom: 18px;
+            right: 22px;
+            color: #a5723e;
+            font-family: monospace;
+            font-size: 11px;
+            z-index: 30;
+            background: rgba(0,0,0,0.55);
+            padding: 5px 12px;
+            border-radius: 30px;
+            letter-spacing: 1.5px;
+            opacity: 0.65;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(2px);
+        }
+        .skip-btn:hover {
+            opacity: 1;
+            color: #ffcf8a;
+        }
+
+        /* Animação de fade out */
+        .fade-out {
+            animation: fadeOutAnim 0.9s forwards;
+        }
+
+        @keyframes fadeOutAnim {
+            0% { opacity: 1; visibility: visible; }
+            100% { opacity: 0; visibility: hidden; display: none; }
+        }
+
+        @media (max-width: 600px) {
+            .studio-brand h2 { white-space: normal; word-break: keep-all; font-size: 2rem; }
+            .game-logo h1 { white-space: normal; font-size: 2.8rem; letter-spacing: 3px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="splash-container" id="splashScreen">
+    <div class="splash-content">
+        <!-- ESTÚDIO IVO & ARTHUR -->
+        <div class="studio-brand" id="studioBrand">
+            <h2>IVO & ARTHUR</h2>
+            <p>✦ APRESENTAM ✦</p>
+        </div>
+
+        <!-- LOGO JOGO DA VELHA -->
+        <div class="game-logo" id="gameLogo">
+            <div class="vintage-divider" id="vintageDivider"></div>
+            <h1>JOGO DA VELHA</h1>
+            <div class="tagline" id="taglineText">★ O CLÁSSICO EM ESTILO RETRÔ ★</div>
+        </div>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div class="progress-area" id="progressArea">
+        <div class="progress-bg">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Detalhes vintage -->
+    <div class="film-dots">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="scanlines"></div>
+    <div class="skip-btn" id="skipBtn">⏎ PULAR (ESPACE)</div>
+</div>
+
+<script>
+    (function() {
+        // Elementos
+        const studio = document.getElementById('studioBrand');
+        const logo = document.getElementById('gameLogo');
+        const divider = document.getElementById('vintageDivider');
+        const tagline = document.getElementById('taglineText');
+        const progressArea = document.getElementById('progressArea');
+        const progressFill = document.getElementById('progressFill');
+        const splash = document.getElementById('splashScreen');
+        const skipBtn = document.getElementById('skipBtn');
+
+        // Controles
+        let skipped = false;
+        let progressInterval = null;
+        let mainTimer = null;
+
+        // Efeito flicker
+        function doFlicker() {
+            splash.classList.add('flicker');
+            setTimeout(() => splash.classList.remove('flicker'), 250);
+        }
+
+        // Animar linha divisória
+        function animateDivider(duration, callback) {
+            divider.style.transition = `width ${duration}ms cubic-bezier(0.42, 0, 0.28, 1.1)`;
+            divider.style.width = '65%';
+            setTimeout(() => { if(callback && !skipped) callback(); }, duration);
+        }
+
+        // Barra de progresso
+        function startProgress(totalDuration) {
+            progressArea.style.opacity = '1';
+            const startTime = Date.now();
+            progressInterval = setInterval(() => {
+                if (skipped) return;
+                const elapsed = Date.now() - startTime;
+                let percent = Math.min(100, (elapsed / totalDuration) * 100);
+                progressFill.style.width = percent + '%';
+                
+                if (percent >= 100) {
+                    clearInterval(progressInterval);
+                    finishSplash();
+                }
+            }, 35);
+        }
+
+        // Finalizar splash (desaparece)
+        function finishSplash() {
+            if (skipped) return;
+            skipped = true;
+            clearInterval(progressInterval);
+            if (mainTimer) clearTimeout(mainTimer);
+            
+            splash.classList.add('fade-out');
+            
+            // Opcional: exibe uma mensagem após sumir
+            setTimeout(() => {
+                if (splash.parentNode) {
+                    // Remove a splash e mostra uma tela simples
+                    document.body.innerHTML = `
+                        <div style="
+                            width: 100vw;
+                            height: 100vh;
+                            background: #0a0a0a;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            font-family: 'Courier New', monospace;
+                            text-align: center;
+                        ">
+                            <div style="
+                                background: linear-gradient(135deg, #1f150e, #0e0905);
+                                padding: 2rem;
+                                border-radius: 50px;
+                                border: 2px solid #d4a055;
+                            ">
+                                <h1 style="color: #ffdd99; font-size: 2rem; letter-spacing: 4px;">JOGO DA VELHA</h1>
+                                <div style="width: 60px; height: 2px; background: #d4a055; margin: 20px auto;"></div>
+                                <p style="color: #b8864b;">Splash Screen Finalizada</p>
+                                <p style="color: #8b6946; font-size: 0.8rem; margin-top: 25px;">✦ IVO & ARTHUR APRESENTA ✦</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }, 950);
+        }
+
+        // Pular introdução
+        function skipSplash() {
+            if (skipped) return;
+            skipped = true;
+            clearInterval(progressInterval);
+            if (mainTimer) clearTimeout(mainTimer);
+            finishSplash();
+        }
+
+        // Sequência da splash screen
+        function runSequence() {
+            // Aparece estúdio
+            studio.style.transition = 'opacity 1.3s ease-out, transform 1s ease';
+            studio.style.opacity = '1';
+            studio.style.transform = 'scale(1)';
+            doFlicker();
+            
+            // Após 1.8s, aparece o logo
+            mainTimer = setTimeout(() => {
+                if (skipped) return;
+                
+                logo.style.transition = 'opacity 1s ease, transform 0.9s cubic-bezier(0.33, 1.2, 0.68, 1)';
+                logo.style.opacity = '1';
+                logo.style.transform = 'scale(1)';
+                
+                animateDivider(700, () => {
+                    if (!skipped) {
+                        tagline.style.transition = 'opacity 1s';
+                        tagline.style.opacity = '1';
+                        doFlicker();
+                    }
+                });
+                
+                // Inicia barra de progresso (3 segundos)
+                startProgress(3000);
+                setTimeout(() => doFlicker(), 250);
+                
+            }, 1800);
+        }
+
+        // Eventos para pular
+        window.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Space' || e.key === 'Enter') {
+                e.preventDefault();
+                skipSplash();
+            }
+        });
+        skipBtn.addEventListener('click', skipSplash);
+
+        // Iniciar
+        setTimeout(() => {
+            if (!skipped) runSequence();
+        }, 80);
+    })();
+</script>
+</body>
+</html>
